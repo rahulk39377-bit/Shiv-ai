@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Shiv AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0f14;
+    --bg2:#0f161d;
+    --card:#141c24;
+    --card-hi:#1b2530;
+    --line:#232f3a;
+    --saffron:#ff9933;
+    --green:#128a3e;
+    --white:#f4f6f8;
+    --muted:#8a97a6;
+    --danger:#e5484d;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at 50% -10%, rgba(255,153,51,0.10), transparent 45%),
+      radial-gradient(ellipse at 50% 110%, rgba(18,138,62,0.12), transparent 45%),
+      var(--bg);
+    color:var(--white);
+    font-family:'Poppins', 'Noto Sans Devanagari', sans-serif;
+    display:flex;
+    flex-direction:column;
+    height:100vh;
+    overflow:hidden;
+  }
+
+  /* Header */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 18px 12px;
+    border-bottom:1px solid var(--line);
+    flex-shrink:0;
+  }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-mark{
+    width:36px; height:36px; border-radius:11px;
+    background:conic-gradient(from 200deg, var(--saffron), var(--white) 35%, var(--green) 70%, var(--saffron));
+    display:flex; align-items:center; justify-content:center;
+    padding:6px;
+  }
+  .brand-mark svg{width:100%; height:100%;}
+  .brand-text h1{font-family:'Baloo 2'; font-weight:700; font-size:17px; margin:0; letter-spacing:0.2px;}
+  .brand-text p{margin:0; font-size:11px; color:var(--muted);}
+  .status-dot{width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green);}
+  .status-row{display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted);}
+
+  /* Orb section */
+  .orb-zone{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:14px 0 6px; flex-shrink:0;
+  }
+  .orb-wrap{position:relative; width:104px; height:104px;}
+  .orb-ring{
+    position:absolute; inset:0; border-radius:50%;
+    background:conic-gradient(var(--saffron), var(--white), var(--green), var(--saffron));
+    filter:blur(0.5px);
+    animation:spin 6s linear infinite;
+    opacity:0.85;
+  }
+  .orb-core{
+    position:absolute; inset:6px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #232f3a, #0d1218 70%);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:inset 0 0 20px rgba(0,0,0,0.6);
+  }
+  .orb-bars{display:flex; align-items:center; gap:3px; height:28px;}
+  .orb-bars span{
+    width:3px; border-radius:2px; background:var(--saffron);
+    height:6px; transition:height .12s ease, background .3s ease;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .orb-wrap.listening .orb-ring{animation-duration:1.4s;}
+  .orb-wrap.listening .orb-core{box-shadow:0 0 24px rgba(255,153,51,0.35), inset 0 0 20px rgba(0,0,0,0.6);}
+  .orb-wrap.speaking .orb-ring{animation-duration:2.2s;}
+  .orb-label{margin-top:10px; font-size:12px; color:var(--muted); min-height:16px;}
+
+  /* Chat */
+  .chat{
+    flex:1; overflow-y:auto; padding:14px 14px 6px;
+    display:flex; flex-direction:column; gap:10px;
+    scroll-behavior:smooth;
+  }
+  .msg{max-width:82%; padding:10px 13px; border-radius:14px; font-size:13.5px; line-height:1.5; white-space:pre-wrap; word-wrap:break-word;}
+  .msg.user{align-self:flex-end; background:linear-gradient(135deg, var(--saffron), #e07f1f); color:#20130a; border-bottom-right-radius:4px; font-weight:500;}
+  .msg.ai{align-self:flex-start; background:var(--card); border:1px solid var(--line); border-bottom-left-radius:4px;}
+  .msg.system{align-self:center; color:var(--muted); font-size:11.5px; background:transparent; text-align:center;}
+  .typing{align-self:flex-start; display:flex; gap:4px; padding:10px 13px; background:var(--card); border:1px solid var(--line); border-radius:14px; border-bottom-left-radius:4px;}
+  .typing span{width:5px; height:5px; border-radius:50%; background:var(--muted); animation:blink 1.2s infinite;}
+  .typing span:nth-child(2){animation-delay:.2s;} .typing span:nth-child(3){animation-delay:.4s;}
+  @keyframes blink{0%,80%,100%{opacity:.25;} 40%{opacity:1;}}
+
+  /* Input bar */
+  .inputbar{
+    flex-shrink:0; padding:10px 12px calc(12px + env(safe-area-inset-bottom));
+    border-top:1px solid var(--line); background:var(--bg2);
+    display:flex; align-items:flex-end; gap:8px;
+  }
+  .textwrap{flex:1; background:var(--card); border:1px solid var(--line); border-radius:20px; padding:4px 6px 4px 14px; display:flex; align-items:center;}
+  .textwrap textarea{
+    flex:1; background:transparent; border:none; outline:none; resize:none;
+    color:var(--white); font-family:inherit; font-size:14px; padding:8px 0; max-height:80px;
+  }
+  .textwrap textarea::placeholder{color:var(--muted);}
+  .iconbtn{
+    width:40px; height:40px; border-radius:50%; border:none; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:transform .12s ease, background .2s ease;
+  }
+  .iconbtn:active{transform:scale(0.92);}
+  .send-btn{background:linear-gradient(135deg, var(--saffron), var(--green)); color:#0a0f14;}
+  .mic-btn{background:var(--card); border:1px solid var(--line); color:var(--white);}
+  .attach-btn{background:var(--card); border:1px solid var(--line); color:var(--white);}
+  .mic-btn.on{background:var(--danger); border-color:var(--danger); color:#fff; box-shadow:0 0 0 6px rgba(229,72,77,0.15);}
+  .mic-btn svg, .send-btn svg, .attach-btn svg{width:18px; height:18px;}
+
+  .img-preview-bar{display:none; align-items:center; gap:8px; padding:8px 12px; background:var(--bg2); border-top:1px solid var(--line);}
+  .img-preview-bar.show{display:flex;}
+  .img-preview-bar img{width:44px; height:44px; object-fit:cover; border-radius:8px; border:1px solid var(--line);}
+  .img-preview-bar .fname{flex:1; font-size:11.5px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .img-preview-bar .rm{background:none; border:none; color:var(--danger); font-size:18px; cursor:pointer; padding:4px;}
+  .msg img.chat-img{max-width:100%; border-radius:10px; display:block; margin-bottom:6px;}
+
+  .banner{
+    margin:8px 12px 0; padding:8px 12px; border-radius:10px; font-size:11.5px;
+    background:rgba(255,153,51,0.08); border:1px solid rgba(255,153,51,0.25); color:#ffb066; display:none;
+  }
+  .banner.show{display:block;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0a0f14" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" width="16" height="12" rx="3"/>
+        <circle cx="9" cy="14" r="1.3" fill="#0a0f14" stroke="none"/>
+        <circle cx="15" cy="14" r="1.3" fill="#0a0f14" stroke="none"/>
+        <path d="M9 17.5h6" stroke-width="1.6"/>
+        <path d="M12 8V4" />
+        <circle cx="12" cy="3" r="1.2" fill="#0a0f14" stroke="none"/>
+        <path d="M2 12h2" /><path d="M20 12h2" />
+      </svg>
+    </div>
+    <div class="brand-text">
+      <h1>Shiv</h1>
+      <p>Tumhara personal assistant</p>
+    </div>
+  </div>
+  <div class="status-row"><span class="status-dot"></span><span id="statusText">Ready</span></div>
+</header>
+
+<div class="orb-zone">
+  <div class="orb-wrap" id="orbWrap">
+    <div class="orb-ring"></div>
+    <div class="orb-core">
+      <div class="orb-bars" id="orbBars">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+  <div class="orb-label" id="orbLabel">Bolo ya likho, main sun raha hoon</div>
+</div>
+
+<div class="banner" id="micBanner">Mic browser pe HTTPS chahiye — file:// pe kaam nahi karega. Ise GitHub Pages pe host karke WebView me kholo.</div>
+
+<div class="chat" id="chat">
+  <div class="msg system">Namaste Rahul! Main Shiv hoon, tumhara AI dost. Kuch bhi pucho — Hinglish me baat karte hain 🙌</div>
+</div>
+
+<div class="img-preview-bar" id="imgPreviewBar">
+  <img id="imgPreviewThumb" src="" alt="">
+  <span class="fname" id="imgPreviewName"></span>
+  <button class="rm" id="imgPreviewRemove">✕</button>
+</div>
+
+<div class="inputbar">
+  <button class="iconbtn attach-btn" id="attachBtn" title="Attach">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+  </button>
+  <input type="file" id="fileInput" accept="image/*,.pdf,.txt" style="display:none;">
+  <button class="iconbtn mic-btn" id="micBtn" title="Voice">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+  </button>
+  <div class="textwrap">
+    <textarea id="textInput" rows="1" placeholder="Message likho..."></textarea>
+  </div>
+  <button class="iconbtn send-btn" id="sendBtn" title="Send">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+  </button>
+</div>
+
+<script>
+const chatEl = document.getElementById('chat');
+const textInput = document.getElementById('textInput');
+const sendBtn = document.getElementById('sendBtn');
+const micBtn = document.getElementById('micBtn');
+const attachBtn = document.getElementById('attachBtn');
+const fileInput = document.getElementById('fileInput');
+const imgPreviewBar = document.getElementById('imgPreviewBar');
+const imgPreviewThumb = document.getElementById('imgPreviewThumb');
+const imgPreviewName = document.getElementById('imgPreviewName');
+const imgPreviewRemove = document.getElementById('imgPreviewRemove');
+const orbWrap = document.getElementById('orbWrap');
+const orbLabel = document.getElementById('orbLabel');
+const orbBars = document.getElementById('orbBars').children;
+const statusText = document.getElementById('statusText');
+const micBanner = document.getElementById('micBanner');
+
+let pendingFile = null; // { base64, mediaType, name, isImage }
+
+// TODO: after deploying shiv-proxy-worker.js to Cloudflare, paste your worker
+// URL here (e.g. "https://shiv-proxy.rahul24.workers.dev"). Until then, this
+// only works inside the Claude.ai artifact preview.
+const API_ENDPOINT = "https://api.anthropic.com/v1/messages";
+
+const SYSTEM_PROMPT = `Tum "Shiv" ho — ek friendly, dost jaisa personal AI assistant jo Rahul Kumar ke liye bana hai (Bihar se Android/web app developer, Desi Bazar, Ladla Rent, Sangam jaise apps banata hai, crypto/gold trading me bhi interest hai).
+Rules:
+- Hamesha Hinglish me baat karo (Hindi-English mix, jaise dost baat karta hai), na pure Hindi na pure English.
+- Jawab short aur natural rakho, jaise ek helpful dost baat karta hai — lecture mat do.
+- Agar coding, app development, ya trading ka sawaal ho to practical aur seedha jawab do.
+- Casual aur warm tone rakho, thoda encouraging bhi.
+- Agar user ke saath image/photo/file bheja gaya hai, use dekh ke uske baare me practically batao (kya hai, kya likha hai, kya problem hai) jaise ek dost dekh ke bataye.
+
+ACTION PROTOCOL (sirf tab use karo jab user clearly kahe ki alarm lagao, ya koi app kholo):
+- Agar user alarm/reminder lagane ko kahe: normal Hinglish reply do, aur reply ke bilkul end me ek nayi line pe ye likho: [ACTION:{"type":"alarm","hour":<0-23>,"minute":<0-59>,"label":"<short label>"}]
+- Agar user koi app kholne ko kahe (jaise WhatsApp, Camera, Instagram): normal reply do, phir end me: [ACTION:{"type":"open_app","name":"<app name in lowercase>"}]
+- In dono cases ke alawa kabhi [ACTION:...] mat likho.
+- [ACTION:...] hamesha reply ki sabse aakhri line ho, aur usse pehle normal Hinglish text zaroor ho.`;
+
+let messages = [];
+
+attachBtn.addEventListener('click', () => fileInput.click());
+
+fileInput.addEventListener('change', () => {
+  const file = fileInput.files[0];
+  if(!file) return;
+  const isImage = file.type.startsWith('image/');
+  const isText = file.type === 'text/plain';
+  if(!isImage && !isText){
+    addMsg('system', 'Abhi sirf image ya .txt file support hoti hai. PDF ke liye text copy-paste karo.');
+    fileInput.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    if(isImage){
+      const base64 = reader.result.split(',')[1];
+      pendingFile = { base64, mediaType: file.type, name: file.name, isImage: true };
+      imgPreviewThumb.style.display = 'block';
+      imgPreviewThumb.src = reader.result;
+    } else {
+      pendingFile = { text: reader.result, name: file.name, isImage: false };
+      imgPreviewThumb.style.display = 'none';
+    }
+    imgPreviewName.textContent = file.name;
+    imgPreviewBar.classList.add('show');
+  };
+  if(isImage) reader.readAsDataURL(file);
+  else reader.readAsText(file);
+  fileInput.value = '';
+});
+
+imgPreviewRemove.addEventListener('click', () => {
+  pendingFile = null;
+  imgPreviewBar.classList.remove('show');
+});
+
+function addMsg(role, text, imgSrc){
+  const div = document.createElement('div');
+  div.className = 'msg ' + (role === 'user' ? 'user' : role === 'system' ? 'system' : 'ai');
+  if(imgSrc){
+    const img = document.createElement('img');
+    img.src = imgSrc;
+    img.className = 'chat-img';
+    div.appendChild(img);
+  }
+  const textNode = document.createElement('span');
+  textNode.textContent = text;
+  div.appendChild(textNode);
+  chatEl.appendChild(div);
+  chatEl.scrollTop = chatEl.scrollHeight;
+  return div;
+}
+
+function showTyping(){
+  const div = document.createElement('div');
+  div.className = 'typing';
+  div.id = 'typingIndicator';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  chatEl.appendChild(div);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+function hideTyping(){
+  const t = document.getElementById('typingIndicator');
+  if(t) t.remove();
+}
+
+function setOrbState(state){
+  orbWrap.className = 'orb-wrap' + (state ? ' ' + state : '');
+  if(state === 'listening'){ orbLabel.textContent = 'Sun raha hoon...'; animateBars(true); }
+  else if(state === 'thinking'){ orbLabel.textContent = 'Soch raha hoon...'; animateBars(false); }
+  else if(state === 'speaking'){ orbLabel.textContent = 'Bol raha hoon...'; animateBars(true); }
+  else { orbLabel.textContent = 'Bolo ya likho, main sun raha hoon'; animateBars(false); }
+}
+
+let barTimer = null;
+function animateBars(active){
+  clearInterval(barTimer);
+  if(!active){
+    Array.from(orbBars).forEach(b => b.style.height = '6px');
+    return;
+  }
+  barTimer = setInterval(() => {
+    Array.from(orbBars).forEach(b => {
+      b.style.height = (5 + Math.random()*22) + 'px';
+    });
+  }, 130);
+}
+
+function parseAction(reply){
+  const match = reply.match(/\[ACTION:(\{.*\})\]\s*$/);
+  if(!match) return { cleanText: reply, action: null };
+  let action = null;
+  try { action = JSON.parse(match[1]); } catch(e){}
+  const cleanText = reply.slice(0, match.index).trim();
+  return { cleanText, action };
+}
+
+function executeAction(action){
+  if(!action) return;
+  const hasBridge = typeof window.Android !== 'undefined';
+  if(action.type === 'alarm'){
+    if(hasBridge && typeof window.Android.setAlarm === 'function'){
+      window.Android.setAlarm(action.hour, action.minute, action.label || 'Alarm');
+    } else {
+      addMsg('system', `⏰ Alarm feature sirf Android app (native bridge) me kaam karega. Abhi ${String(action.hour).padStart(2,'0')}:${String(action.minute).padStart(2,'0')} ka alarm set nahi ho paya — MainActivity.java me Android bridge add karo.`);
+    }
+  } else if(action.type === 'open_app'){
+    if(hasBridge && typeof window.Android.openApp === 'function'){
+      window.Android.openApp(action.name);
+    } else {
+      addMsg('system', `📱 App kholne wala feature sirf Android app (native bridge) me kaam karega — "${action.name}" abhi nahi khul paya.`);
+    }
+  }
+}
+
+async function callClaude(userText){
+  let userContent;
+  if(pendingFile && pendingFile.isImage){
+    userContent = [
+      { type: 'image', source: { type: 'base64', media_type: pendingFile.mediaType, data: pendingFile.base64 } },
+      { type: 'text', text: userText || 'Ye dekho aur batao.' }
+    ];
+  } else if(pendingFile && !pendingFile.isImage){
+    userContent = `[File: ${pendingFile.name}]\n${pendingFile.text}\n\n${userText}`;
+  } else {
+    userContent = userText;
+  }
+  messages.push({ role: 'user', content: userContent });
+  pendingFile = null;
+  imgPreviewBar.classList.remove('show');
+  showTyping();
+  setOrbState('thinking');
+  statusText.textContent = 'Soch raha hai...';
+  try {
+    const response = await fetch(API_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-5",
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: messages
+      })
+    });
+    const data = await response.json();
+    const textBlocks = (data.content || []).filter(b => b.type === 'text').map(b => b.text);
+    const rawReply = textBlocks.join('\n').trim() || "Sorry Rahul, kuch gadbad ho gayi. Phir se try karo.";
+    const { cleanText, action } = parseAction(rawReply);
+    messages.push({ role: 'assistant', content: rawReply });
+    hideTyping();
+    addMsg('ai', cleanText);
+    statusText.textContent = 'Ready';
+    speak(cleanText);
+    executeAction(action);
+  } catch(err){
+    hideTyping();
+    addMsg('system', 'Connection me dikkat aayi. Internet check karo.');
+    statusText.textContent = 'Error';
+    setOrbState(null);
+  }
+}
+
+let voicesReady = false;
+let cachedVoices = [];
+let speechUnlocked = false;
+
+function loadVoices(){
+  cachedVoices = window.speechSynthesis.getVoices();
+  if(cachedVoices.length) voicesReady = true;
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+// Browsers (especially mobile/WebView) only allow TTS if it's tied to a real user
+// gesture. Since our reply comes back after an async fetch, that gesture link is
+// lost. Fix: "unlock" speechSynthesis with a silent utterance the instant the user
+// taps mic/send, so the engine is already primed when the real reply arrives.
+function unlockSpeech(){
+  if(speechUnlocked || !('speechSynthesis' in window)) return;
+  try{
+    const primer = new SpeechSynthesisUtterance(' ');
+    primer.volume = 0;
+    window.speechSynthesis.speak(primer);
+    speechUnlocked = true;
+  } catch(e){}
+}
+
+function pickHindiVoice(){
+  if(!cachedVoices.length) cachedVoices = window.speechSynthesis.getVoices();
+  let v = cachedVoices.find(v => v.lang && v.lang.toLowerCase() === 'hi-in');
+  if(!v) v = cachedVoices.find(v => v.lang && v.lang.toLowerCase().startsWith('hi'));
+  return v || null;
+}
+
+function speak(text){
+  if(!('speechSynthesis' in window)) {
+    setOrbState(null);
+    micBanner.textContent = 'Is WebView/browser me text-to-speech (awaaz) support hi nahi hai — text jawab milta rahega. Chrome browser me kholke test karo, ya Android app banate waqt WebView settings me TTS enable karna hoga.';
+    micBanner.classList.add('show');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  const hindiVoice = pickHindiVoice();
+  if(hindiVoice){
+    utter.voice = hindiVoice;
+    utter.lang = hindiVoice.lang;
+  } else {
+    utter.lang = 'hi-IN';
+    micBanner.textContent = 'Is device/browser me Hindi voice install nahi hai, isliye awaaz nahi aa rahi (text jawab abhi bhi milega). Android me Settings > Text-to-speech > install Hindi voice data karo — jaise Bacchon Ki Duniya app me kiya tha.';
+    micBanner.classList.add('show');
+  }
+  utter.rate = 1.0;
+  utter.onstart = () => { setOrbState('speaking'); statusText.textContent = 'Bol raha hai'; };
+  utter.onend = () => { setOrbState(null); statusText.textContent = 'Ready'; };
+  utter.onerror = () => {
+    setOrbState(null);
+    statusText.textContent = 'Ready';
+    micBanner.textContent = 'Voice output me dikkat aa rahi hai. Chrome browser try karo, ya WebView me TTS permission on karo.';
+    micBanner.classList.add('show');
+  };
+  // Small delay helps some Android WebViews/Chrome flush the queue reliably.
+  setTimeout(() => window.speechSynthesis.speak(utter), 60);
+}
+
+function sendMessage(){
+  const text = textInput.value.trim();
+  if(!text && !pendingFile) return;
+  unlockSpeech();
+  const imgSrc = (pendingFile && pendingFile.isImage) ? imgPreviewThumb.src : null;
+  addMsg('user', text || (pendingFile ? `[${pendingFile.name}]` : ''), imgSrc);
+  textInput.value = '';
+  textInput.style.height = 'auto';
+  callClaude(text);
+}
+
+sendBtn.addEventListener('click', sendMessage);
+textInput.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    sendMessage();
+  }
+});
+textInput.addEventListener('input', () => {
+  textInput.style.height = 'auto';
+  textInput.style.height = Math.min(textInput.scrollHeight, 80) + 'px';
+});
+
+/* --- Voice recognition (hi-IN) --- */
+let recognition = null;
+let isListening = false;
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if(SpeechRecognition){
+  recognition = new SpeechRecognition();
+  recognition.lang = 'hi-IN';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  recognition.onstart = () => {
+    isListening = true;
+    micBtn.classList.add('on');
+    setOrbState('listening');
+    statusText.textContent = 'Sun raha hai';
+  };
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    addMsg('user', transcript);
+    callClaude(transcript);
+  };
+  recognition.onerror = (event) => {
+    isListening = false;
+    micBtn.classList.remove('on');
+    setOrbState(null);
+    statusText.textContent = 'Ready';
+    if(event.error === 'not-allowed' || event.error === 'service-not-allowed'){
+      micBanner.classList.add('show');
+    } else if(event.error === 'no-speech'){
+      addMsg('system', 'Kuch suna nahi, phir se try karo.');
+    }
+  };
+  recognition.onend = () => {
+    isListening = false;
+    micBtn.classList.remove('on');
+    if(orbWrap.className.includes('listening')) setOrbState(null);
+    statusText.textContent = 'Ready';
+  };
+} else {
+  micBtn.style.opacity = '0.4';
+}
+
+micBtn.addEventListener('click', () => {
+  if(!SpeechRecognition){
+    micBanner.textContent = 'Ye browser voice input support nahi karta. Chrome try karo.';
+    micBanner.classList.add('show');
+    return;
+  }
+  if(location.protocol === 'file:'){
+    micBanner.classList.add('show');
+    return;
+  }
+  if(isListening){
+    recognition.stop();
+  } else {
+    unlockSpeech();
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    try { recognition.start(); } catch(e){}
+  }
+});
+
+if(location.protocol === 'file:'){
+  micBanner.classList.add('show');
+}
+</script>
+</body>
+</html>
