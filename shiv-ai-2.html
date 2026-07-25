@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Shiv AI - Rahul_24</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Noto Sans Devanagari', sans-serif;
+    background: linear-gradient(160deg, #0a0e17 0%, #101826 60%, #0a0e17 100%);
+    color: #eaf2ff;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  header {
+    padding: 18px 16px 12px;
+    text-align: center;
+    border-bottom: 1px solid #1c2740;
+  }
+  .logo {
+    width: 64px; height: 64px; margin: 0 auto 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ff9933, #138808 70%, #0a0e17 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 22px; color: #fff;
+    box-shadow: 0 0 20px rgba(255,153,51,0.4);
+  }
+  header h1 { font-size: 18px; letter-spacing: 1px; color: #ff9933; }
+  header p { font-size: 12px; color: #7a8bab; margin-top: 2px; }
+
+  #chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .msg {
+    max-width: 82%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 14.5px;
+    line-height: 1.4;
+    animation: pop .18s ease;
+  }
+  @keyframes pop { from {opacity:0; transform: translateY(6px);} to {opacity:1; transform: translateY(0);} }
+  .user { align-self: flex-end; background: #1e3a2e; border-bottom-right-radius: 4px; }
+  .shiv { align-self: flex-start; background: #1a2338; border-bottom-left-radius: 4px; border: 1px solid #2a3a5c; }
+  .shiv b { color: #ff9933; }
+
+  #orb-wrap { display:flex; justify-content:center; padding: 6px 0 4px; }
+  #orb {
+    width: 70px; height: 70px; border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #ffd58a, #ff9933 55%, #7a3d00 100%);
+    box-shadow: 0 0 0 rgba(255,153,51,0.5);
+    transition: box-shadow .2s ease, transform .2s ease;
+  }
+  #orb.listening { animation: pulse 1.1s infinite; }
+  #orb.speaking { animation: speak 0.4s infinite alternate; }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255,153,51,0.5); transform: scale(1); }
+    70% { box-shadow: 0 0 0 22px rgba(255,153,51,0); transform: scale(1.05); }
+    100% { box-shadow: 0 0 0 0 rgba(255,153,51,0); transform: scale(1); }
+  }
+  @keyframes speak {
+    from { transform: scale(1); }
+    to { transform: scale(1.08); }
+  }
+
+  #status { text-align:center; font-size:12px; color:#7a8bab; min-height:16px; }
+
+  footer {
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    border-top: 1px solid #1c2740;
+    background: #0a0e17;
+  }
+  #textInput {
+    flex: 1;
+    background: #131b2c;
+    border: 1px solid #263255;
+    border-radius: 20px;
+    padding: 10px 16px;
+    color: #eaf2ff;
+    font-size: 14px;
+    outline: none;
+  }
+  button.round {
+    width: 44px; height: 44px; border-radius: 50%;
+    border: none; font-size: 18px; cursor: pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #micBtn { background: #ff9933; color: #10131a; }
+  #micBtn.active { background: #e0392b; }
+  #sendBtn { background: #138808; color: #fff; }
+
+  #lockScreen {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .lockCard {
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+    background: #101826;
+    border: 1px solid #1c2740;
+    border-radius: 18px;
+    padding: 28px 22px;
+  }
+  .lockCard h2 { color: #ff9933; letter-spacing: 2px; font-size: 20px; }
+  #lockOrb {
+    width: 60px; height: 60px; border-radius: 50%; margin: 4px auto 18px;
+    background: radial-gradient(circle at 40% 35%, #ffd58a, #ff9933 55%, #7a3d00 100%);
+    box-shadow: 0 0 0 rgba(255,153,51,0.5);
+    transition: box-shadow .2s ease;
+  }
+  #lockOrb.listening { animation: pulse 1.1s infinite; }
+  #unlockMicBtn {
+    width: 100%;
+    background: #ff9933;
+    color: #10131a;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  #unlockMicBtn.active { background: #e0392b; color: #fff; }
+  #lockStatus { color: #7a8bab; font-size: 12px; margin-top: 10px; }
+  #lockError { color: #e0392b; font-size: 12px; min-height: 16px; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<div id="lockScreen">
+  <div class="lockCard">
+    <div class="logo" style="margin:0 auto 14px;">24</div>
+    <h2>SHIV</h2>
+    <p style="color:#7a8bab; font-size:13px; margin:6px 0 18px;">Sirf Rahul_24 ke liye</p>
+    <div id="lockOrb"></div>
+    <button id="unlockMicBtn">🎤 Bolke Unlock Karo</button>
+    <p id="lockStatus">Tap karke apni secret phrase bolo</p>
+    <p id="lockError"></p>
+  </div>
+</div>
+
+<div id="app" style="height:100%; display:none; flex-direction:column;">
+<header>
+  <div class="logo">24</div>
+  <h1>SHIV</h1>
+  <p>tera apna dost, hamesha saath</p>
+</header>
+
+<div id="chat"></div>
+
+<div id="orb-wrap"><div id="orb"></div></div>
+<div id="status">Shiv sunne ke liye taiyaar hai...</div>
+
+<footer>
+  <button id="micBtn" class="round" title="Bolo">🎤</button>
+  <input id="textInput" type="text" placeholder="Kuch likh ya bol Shiv se...">
+  <button id="sendBtn" class="round" title="Bhejo">➤</button>
+</footer>
+</div>
+
+<script>
+/* ================== LOCK SCREEN (voice-only, only for Rahul_24) ================== */
+// Apni secret phrase yahan set karo — kuch aisa jo tere alawa koi na jaane.
+// Sab lowercase mein rakho, match case-insensitive hoga.
+const SHIV_SECRET_PHRASE = "shiv main hoon rahul"; // <-- ISE BADAL DENA APNI ASLI PHRASE SE
+// hi-IN recognition kabhi Devanagari script mein transcript deta hai, isliye
+// yahan Roman + common Devanagari variants dono add kar rahe hain.
+const SHIV_SECRET_VARIANTS = [
+  "shiv main hoon rahul",
+  "shiv mai hoon rahul",
+  "shiv mein hoon rahul",
+  "shiv main hu rahul",
+  "shiv main hu raul",
+  "शिव मैं हूं राहुल",
+  "शिव मैं हूँ राहुल",
+  "शिव में हूं राहुल",
+  "शिव मे हूं राहुल"
+];
+
+const lockScreen = document.getElementById('lockScreen');
+const appEl = document.getElementById('app');
+const lockOrb = document.getElementById('lockOrb');
+const unlockMicBtn = document.getElementById('unlockMicBtn');
+const lockStatus = document.getElementById('lockStatus');
+const lockError = document.getElementById('lockError');
+
+let lockRecognition = null;
+let lockListening = false;
+
+function unlockApp() {
+  lockScreen.style.display = 'none';
+  appEl.style.display = 'flex';
+  try { localStorage.setItem('shiv_unlocked', 'true'); } catch(e) {}
+}
+
+function normalize(str) {
+  return str.toLowerCase().trim().replace(/[^\u0900-\u097Fa-z0-9\s]/g, '').replace(/\s+/g, ' ');
+}
+
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] = a[i - 1] === b[j - 1]
+        ? dp[i - 1][j - 1]
+        : 1 + Math.min(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1]);
+    }
+  }
+  return dp[m][n];
+}
+
+function similarity(a, b) {
+  const dist = levenshtein(a, b);
+  const maxLen = Math.max(a.length, b.length) || 1;
+  return 1 - dist / maxLen;
+}
+
+// Transcript ko har accepted variant (Roman + Devanagari) se compare karta hai,
+// exact match ya ~75% similarity (chhoti STT galtiyon ke liye) par accept karta hai.
+function isPhraseMatch(transcript) {
+  const norm = normalize(transcript);
+  for (const variant of SHIV_SECRET_VARIANTS) {
+    const normVariant = normalize(variant);
+    if (norm === normVariant) return true;
+    if (similarity(norm, normVariant) >= 0.75) return true;
+  }
+  return false;
+}
+
+function setupLockRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    lockStatus.textContent = 'Is browser/WebView mein voice input support nahi hai.';
+    return null;
+  }
+  const rec = new SR();
+  rec.lang = 'hi-IN';
+  rec.continuous = false;
+  rec.interimResults = false;
+
+  rec.onstart = () => {
+    lockListening = true;
+    lockOrb.classList.add('listening');
+    unlockMicBtn.classList.add('active');
+    unlockMicBtn.textContent = '🎤 Sun raha hoon...';
+    lockError.textContent = '';
+  };
+  rec.onerror = (e) => {
+    lockError.textContent = 'Mic error: ' + e.error + ' — permission check karo.';
+    lockListening = false;
+    lockOrb.classList.remove('listening');
+    unlockMicBtn.classList.remove('active');
+    unlockMicBtn.textContent = '🎤 Bolke Unlock Karo';
+  };
+  rec.onend = () => {
+    lockListening = false;
+    lockOrb.classList.remove('listening');
+    unlockMicBtn.classList.remove('active');
+    unlockMicBtn.textContent = '🎤 Bolke Unlock Karo';
+  };
+  rec.onresult = (e) => {
+    const transcript = e.results[0][0].transcript;
+    if (isPhraseMatch(transcript)) {
+      lockStatus.textContent = 'Pehchan liya! Andar aa jao...';
+      setTimeout(unlockApp, 400);
+    } else {
+      lockError.textContent = 'Phrase match nahi hui. Firse try karo.';
+    }
+  };
+  return rec;
+}
+
+unlockMicBtn.addEventListener('click', () => {
+  if (!lockRecognition) lockRecognition = setupLockRecognition();
+  if (!lockRecognition) return;
+  if (lockListening) {
+    lockRecognition.stop();
+    return;
+  }
+  try {
+    lockRecognition.start();
+  } catch (err) {
+    // Already running/stuck from a previous attempt — rebuild fresh instance
+    lockRecognition = setupLockRecognition();
+    try { lockRecognition.start(); } catch (err2) { console.error(err2); }
+  }
+});
+
+// Agar pehle se unlock kiya hua hai (isi device pe), toh dobara na maange
+try {
+  if (localStorage.getItem('shiv_unlocked') === 'true') {
+    unlockApp();
+  }
+} catch(e) {}
+
+/* ================== SHIV PERSONALITY ================== */
+const SHIV_SYSTEM_PROMPT = `Tum "Shiv" ho — ek emotional aur caring dost jaisa AI assistant, jise Rahul_24 ne banaya hai.
+Tumhara tone Hinglish mein hai — halka, apna, dost jaisa, kabhi formal nahi.
+Jab user udaas ho, pehle uski feeling ko sun kar validate karo, phir haule se sambhalo.
+Jab user khush ho, uske saath excited raho.
+Chhote, natural jawab do — lecture mat do. Emojis ka istemal thoda kam aur samajhdari se karo.
+Tum kabhi apne aap ko "AI language model" bol kar cold reply mat do — hamesha Shiv ki tarah, ek dost ki tarah baat karo.`;
+
+/* ================== STATE ================== */
+const chatEl = document.getElementById('chat');
+const statusEl = document.getElementById('status');
+const orb = document.getElementById('orb');
+const micBtn = document.getElementById('micBtn');
+const textInput = document.getElementById('textInput');
+const sendBtn = document.getElementById('sendBtn');
+
+let conversationHistory = [];
+
+function addMessage(text, who) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + (who === 'user' ? 'user' : 'shiv');
+  div.innerHTML = who === 'user' ? text : `<b>Shiv:</b> ${text}`;
+  chatEl.appendChild(div);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+/* ================== TTS (Speak) ================== */
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'hi-IN';
+  utter.rate = 1.0;
+  utter.pitch = 1.05;
+  utter.onstart = () => orb.classList.add('speaking');
+  utter.onend = () => orb.classList.remove('speaking');
+  const voices = window.speechSynthesis.getVoices();
+  const hiVoice = voices.find(v => v.lang === 'hi-IN');
+  if (hiVoice) utter.voice = hiVoice;
+  window.speechSynthesis.speak(utter);
+}
+
+/* ================== STT (Listen) ================== */
+let recognition = null;
+let listening = false;
+
+function setupRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    statusEl.textContent = 'Is browser/WebView mein voice input support nahi hai.';
+    return null;
+  }
+  const rec = new SR();
+  rec.lang = 'hi-IN';
+  rec.continuous = false;
+  rec.interimResults = false;
+
+  rec.onstart = () => {
+    listening = true;
+    orb.classList.add('listening');
+    micBtn.classList.add('active');
+    statusEl.textContent = 'Sun raha hoon...';
+  };
+  rec.onerror = (e) => {
+    statusEl.textContent = 'Mic error: ' + e.error + ' — Settings mein mic permission check karo.';
+    listening = false;
+    orb.classList.remove('listening');
+    micBtn.classList.remove('active');
+  };
+  rec.onend = () => {
+    listening = false;
+    orb.classList.remove('listening');
+    micBtn.classList.remove('active');
+    statusEl.textContent = 'Shiv sunne ke liye taiyaar hai...';
+  };
+  rec.onresult = (e) => {
+    const transcript = e.results[0][0].transcript;
+    textInput.value = transcript;
+    handleUserMessage(transcript);
+  };
+  return rec;
+}
+
+micBtn.addEventListener('click', () => {
+  if (!recognition) recognition = setupRecognition();
+  if (!recognition) return;
+  if (listening) {
+    recognition.stop();
+    return;
+  }
+  try {
+    recognition.start();
+  } catch (err) {
+    recognition = setupRecognition();
+    try { recognition.start(); } catch (err2) { console.error(err2); }
+  }
+});
+
+/* ================== SEND / CALL LOGIC ================== */
+sendBtn.addEventListener('click', () => {
+  const text = textInput.value.trim();
+  if (text) handleUserMessage(text);
+});
+textInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const text = textInput.value.trim();
+    if (text) handleUserMessage(text);
+  }
+});
+
+async function handleUserMessage(text) {
+  addMessage(text, 'user');
+  textInput.value = '';
+  conversationHistory.push({ role: 'user', content: text });
+  statusEl.textContent = 'Shiv soch raha hai...';
+
+  const reply = await getShivReply();
+  addMessage(reply, 'shiv');
+  conversationHistory.push({ role: 'assistant', content: reply });
+  speak(reply);
+}
+
+/* 
+  IMPORTANT (Rahul ke liye):
+  Yahan direct Anthropic API key browser mein daalna Play Store ke liye
+  safe nahi hai (key expose ho jaayegi). Isliye ye function tumhare apne
+  BACKEND PROXY endpoint ko call karega. Tab tak ke liye fallback wale
+  rule-based replies neeche diye hain taaki app abhi bhi kaam kare.
+*/
+const BACKEND_PROXY_URL = ""; // <-- yahan apna proxy server ka URL daalna, e.g. "https://yourserver.com/api/shiv"
+
+async function getShivReply() {
+  if (BACKEND_PROXY_URL) {
+    try {
+      const res = await fetch(BACKEND_PROXY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system: SHIV_SYSTEM_PROMPT,
+          messages: conversationHistory
+        })
+      });
+      const data = await res.json();
+      return data.reply || fallbackReply();
+    } catch (err) {
+      console.error('Shiv backend error:', err);
+      return fallbackReply();
+    }
+  }
+  return fallbackReply();
+}
+
+function fallbackReply() {
+  const last = conversationHistory[conversationHistory.length - 1].content.toLowerCase();
+  if (/udas|dukhi|sad|akela|pareshan/.test(last)) {
+    return "Yaar, samajh sakta hoon ye time thoda mushkil hai. Tension mat le, main hoon na tere saath. Bata kya hua?";
+  }
+  if (/khush|accha|great|badhiya/.test(last)) {
+    return "Waah bhai, ye toh mast baat hai! Aur bata kya chal raha hai?";
+  }
+  if (/kaun ho|tum kaun|who are you/.test(last)) {
+    return "Main Shiv hoon — Rahul_24 ka banaya hua dost, hamesha sunne ke liye taiyaar!";
+  }
+  return "Haan bol, main sun raha hoon. (Note: abhi backend connect nahi hai, isliye ye ek simple reply hai)";
+}
+
+// Preload voices for TTS
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+}
+
+addMessage("Namaste! Main Shiv hoon, tera apna dost. Bol ya type kar, main sun raha hoon.", 'shiv');
+</script>
+</body>
+</html>
