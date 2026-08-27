@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#16233d"/>
+      <stop offset="100%" stop-color="#0b1220"/>
+    </linearGradient>
+  </defs>
+  <circle cx="256" cy="256" r="250" fill="url(#bg)"/>
+  <path d="M256 6 A250 250 0 0 1 470 187" fill="none" stroke="#FF9933" stroke-width="11" stroke-linecap="round"/>
+  <path d="M470 187 A250 250 0 0 1 400 440" fill="none" stroke="#F5F7FA" stroke-width="11" stroke-linecap="round"/>
+  <path d="M400 440 A250 250 0 0 1 42 187" fill="none" stroke="#138808" stroke-width="11" stroke-linecap="round"/>
+  <path d="M42 187 A250 250 0 0 1 256 6" fill="none" stroke="#FF9933" stroke-width="11" stroke-linecap="round"/>
+  <circle cx="256" cy="290" r="26" fill="#FF9933"/>
+  <path d="M180 290 A76 76 0 0 1 332 290" fill="none" stroke="#F5F7FA" stroke-width="9" stroke-linecap="round"/>
+  <path d="M150 290 A106 106 0 0 1 362 290" fill="none" stroke="#F5F7FA" stroke-width="9" stroke-linecap="round" opacity="0.75"/>
+  <path d="M120 290 A136 136 0 0 1 392 290" fill="none" stroke="#F5F7FA" stroke-width="9" stroke-linecap="round" opacity="0.5"/>
+</svg>
