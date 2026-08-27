@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="SHIV AI — Smart Hindi + English + Hinglish AI Chat with Voice, Business Mode & more" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SHIV AI" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <title>SHIV AI — Smart Chat</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- Splash / Loading -->
+  <div id="splash" class="splash">
+    <div class="splash-logo">
+      <div class="om-symbol">ॐ</div>
+      <h1>SHIV AI</h1>
+      <p>Smart • Voice • Hinglish</p>
+    </div>
+  </div>
+
+  <!-- App Shell -->
+  <div id="app" class="app hidden">
+    <!-- Sidebar (Desktop) / Drawer (Mobile) -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="om">ॐ</span>
+          <span class="logo-text">SHIV AI</span>
+        </div>
+        <button id="close-sidebar" class="icon-btn mobile-only" aria-label="Close menu">✕</button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-view="chat">
+          <span class="nav-icon">💬</span>
+          <span>Chat</span>
+        </button>
+        <button class="nav-item" data-view="dashboard">
+          <span class="nav-icon">📊</span>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-view="business">
+          <span class="nav-icon">💼</span>
+          <span>Business Mode</span>
+        </button>
+        <button class="nav-item" data-view="developer">
+          <span class="nav-icon">🛠️</span>
+          <span>Developer Mode</span>
+        </button>
+        <button class="nav-item" data-view="creative">
+          <span class="nav-icon">🎨</span>
+          <span>Creative Mode</span>
+        </button>
+        <button class="nav-item" data-view="files">
+          <span class="nav-icon">📂</span>
+          <span>File Assistant</span>
+        </button>
+        <button class="nav-item" data-view="settings">
+          <span class="nav-icon">🔐</span>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-chip">
+          <div class="avatar">S</div>
+          <div class="user-info">
+            <strong>SHIV User</strong>
+            <small>Free Plan</small>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <button id="menu-btn" class="icon-btn mobile-only" aria-label="Menu">☰</button>
+        <div class="topbar-title">
+          <span id="current-mode">💬 Smart Chat</span>
+        </div>
+        <div class="topbar-actions">
+          <button id="voice-toggle" class="icon-btn" title="Voice Reply ON/OFF" aria-label="Toggle voice reply">
+            🔊
+          </button>
+          <button id="new-chat" class="icon-btn" title="New Chat" aria-label="New chat">
+            ＋
+          </button>
+        </div>
+      </header>
+
+      <!-- Views Container -->
+      <div class="views">
+        <!-- CHAT VIEW -->
+        <section id="view-chat" class="view active">
+          <div id="chat-messages" class="chat-messages">
+            <div class="message ai">
+              <div class="avatar om-avatar">ॐ</div>
+              <div class="bubble">
+                <p>🙏 Namaste! Main <strong>SHIV AI</strong> hoon.</p>
+                <p>Hindi, English ya Hinglish mein baat karo. Voice se bhi command de sakte ho.</p>
+                <p>Quick actions try karo ya mode change karo (Business / Developer / Creative).</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="quick-actions" id="quick-actions">
+            <button class="qa-btn" data-prompt="LADLA RENT kholo">🏠 LADLA RENT</button>
+            <button class="qa-btn" data-prompt="business idea do">💡 Business Idea</button>
+            <button class="qa-btn" data-prompt="poster banao">🎨 Poster Banao</button>
+            <button class="qa-btn" data-prompt="code explain karo">🛠️ Code Help</button>
+            <button class="qa-btn" data-prompt="pricing strategy batao">💰 Pricing</button>
+            <button class="qa-btn" data-prompt="marketing plan do">📢 Marketing</button>
+          </div>
+
+          <!-- Input Area -->
+          <div class="input-area">
+            <button id="attach-btn" class="mic-btn attach-btn" title="Photo / Video / File" aria-label="Attach">
+              📎
+            </button>
+            <input type="file" id="chat-file-input" accept="image/*,video/*,.pdf,.doc,.docx,.txt,.csv,.json,.xls,.xlsx" multiple hidden />
+            <button id="mic-btn" class="mic-btn" title="Voice Input" aria-label="Voice input">
+              🎤
+            </button>
+            <div class="input-wrapper">
+              <textarea id="user-input" placeholder="Bolkar ya type karo... Photo/Video bhi bhej sakte ho" rows="1"></textarea>
+              <button id="send-btn" class="send-btn" aria-label="Send">➤</button>
+            </div>
+          </div>
+          <!-- Preview strip for selected media -->
+          <div id="media-preview" class="media-preview hidden"></div>
+        </section>
+
+        <!-- DASHBOARD VIEW -->
+        <section id="view-dashboard" class="view">
+          <div class="dashboard">
+            <h2>📊 Dashboard</h2>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <span class="stat-value" id="stat-chats">0</span>
+                <span class="stat-label">Total Chats</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-value" id="stat-messages">0</span>
+                <span class="stat-label">Messages</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-value" id="stat-voice">0</span>
+                <span class="stat-label">Voice Uses</span>
+              </div>
+              <div class="stat-card">
+                <span class="stat-value">Hinglish</span>
+                <span class="stat-label">Preferred Lang</span>
+              </div>
+            </div>
+            <h3>Recent Activity</h3>
+            <ul id="recent-list" class="recent-list">
+              <li>No recent activity yet. Start chatting!</li>
+            </ul>
+            <h3>Tools & Modes</h3>
+            <div class="tools-grid">
+              <div class="tool-card" data-view="business">💼 Business Mode</div>
+              <div class="tool-card" data-view="developer">🛠️ Developer Mode</div>
+              <div class="tool-card" data-view="creative">🎨 Creative Mode</div>
+              <div class="tool-card" data-view="files">📂 File Assistant</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- BUSINESS MODE -->
+        <section id="view-business" class="view">
+          <div class="mode-page">
+            <h2>💼 Business Mode — LADLA GROUP</h2>
+            <p class="mode-desc">Business ideas, pricing, marketing, rent strategies aur growth plans ke liye specialized mode.</p>
+            <div class="mode-prompts">
+              <button class="mode-btn" data-prompt="LADLA RENT ke liye best pricing strategy batao">💰 Pricing Strategy</button>
+              <button class="mode-btn" data-prompt="LADLA GROUP ke liye 5 naye business ideas do">💡 Business Ideas</button>
+              <button class="mode-btn" data-prompt="Rent business ke liye marketing plan banao">📢 Marketing Plan</button>
+              <button class="mode-btn" data-prompt="Customer acquisition strategy batao">🎯 Customer Acquisition</button>
+              <button class="mode-btn" data-prompt="Profit margin kaise badhayein">📈 Profit Tips</button>
+              <button class="mode-btn" data-prompt="Local market analysis do">📍 Market Analysis</button>
+            </div>
+            <button class="back-to-chat" data-view="chat">← Chat mein jaao</button>
+          </div>
+        </section>
+
+        <!-- DEVELOPER MODE -->
+        <section id="view-developer" class="view">
+          <div class="mode-page">
+            <h2>🛠️ Developer Mode</h2>
+            <p class="mode-desc">HTML, CSS, JS code generate, explain, debug aur optimize karo.</p>
+            <div class="mode-prompts">
+              <button class="mode-btn" data-prompt="Ek responsive navbar ka HTML CSS JS code do">📱 Navbar Code</button>
+              <button class="mode-btn" data-prompt="PWA service worker example code do">⚡ PWA Code</button>
+              <button class="mode-btn" data-prompt="JavaScript mein form validation ka code">✅ Form Validation</button>
+              <button class="mode-btn" data-prompt="Dark mode toggle ka pure code">🌙 Dark Mode</button>
+              <button class="mode-btn" data-prompt="Fetch API se data lane ka example">🌐 Fetch Example</button>
+              <button class="mode-btn" data-prompt="Code explain karo: " >📖 Code Explain</button>
+            </div>
+            <button class="back-to-chat" data-view="chat">← Chat mein jaao</button>
+          </div>
+        </section>
+
+        <!-- CREATIVE MODE -->
+        <section id="view-creative" class="view">
+          <div class="mode-page">
+            <h2>🎨 Creative Mode</h2>
+            <p class="mode-desc">Banner, poster, ad, reel concepts, taglines aur creative ideas.</p>
+            <div class="mode-prompts">
+              <button class="mode-btn" data-prompt="LADLA RENT ke liye Instagram poster concept do">📱 Instagram Poster</button>
+              <button class="mode-btn" data-prompt="Reel script banao rent business ke liye">🎬 Reel Script</button>
+              <button class="mode-btn" data-prompt="Catchy tagline do LADLA GROUP ke liye">✨ Tagline</button>
+              <button class="mode-btn" data-prompt="WhatsApp status design idea">💬 Status Idea</button>
+              <button class="mode-btn" data-prompt="Festival offer poster concept">🪔 Festival Poster</button>
+              <button class="mode-btn" data-prompt="Brand color palette suggest karo">🎨 Color Palette</button>
+            </div>
+            <button class="back-to-chat" data-view="chat">← Chat mein jaao</button>
+          </div>
+        </section>
+
+        <!-- FILE ASSISTANT -->
+        <section id="view-files" class="view">
+          <div class="mode-page">
+            <h2>📂 File Assistant</h2>
+            <p class="mode-desc">Documents / files ko samajhne ki capability (demo). File upload karke summary ya questions poochh sakte ho.</p>
+            <div class="file-upload-zone" id="file-zone">
+              <input type="file" id="file-input" accept="image/*,video/*,.txt,.pdf,.doc,.docx,.csv,.json,.xls,.xlsx" hidden />
+              <div class="upload-box" id="upload-box">
+                <span class="upload-icon">📄</span>
+                <p>File yahan drop karo ya click karke select karo</p>
+                <small>TXT, PDF, DOC, CSV, JSON supported (demo)</small>
+              </div>
+              <div id="file-info" class="file-info hidden"></div>
+            </div>
+            <button class="back-to-chat" data-view="chat">← Chat mein jaao</button>
+          </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="view-settings" class="view">
+          <div class="mode-page">
+            <h2>🔐 Settings & Privacy</h2>
+            <div class="settings-list">
+              <div class="setting-item">
+                <label>
+                  <span>🔊 Voice Reply (SHIV AI awaaz)</span>
+                  <input type="checkbox" id="setting-voice" checked />
+                </label>
+              </div>
+              <div class="setting-item">
+                <label>
+                  <span>🌐 Preferred Language</span>
+                  <select id="setting-lang">
+                    <option value="hinglish">Hinglish</option>
+                    <option value="hindi">Hindi</option>
+                    <option value="english">English</option>
+                  </select>
+                </label>
+              </div>
+              <div class="setting-item">
+                <label>
+                  <span>🎤 Auto listen after reply</span>
+                  <input type="checkbox" id="setting-auto-listen" />
+                </label>
+              </div>
+              <div class="setting-item">
+                <label>
+                  <span>💾 Save chat history locally</span>
+                  <input type="checkbox" id="setting-save" checked />
+                </label>
+              </div>
+              <div class="setting-item">
+                <button id="clear-data" class="danger-btn">🗑️ Clear All Local Data</button>
+              </div>
+            </div>
+            <p class="privacy-note">🔒 Sab data aapke device par local storage mein rehta hai. Koi server par nahi jaata (demo version).</p>
+            <button class="back-to-chat" data-view="chat">← Chat mein jaao</button>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Overlay for mobile sidebar -->
+  <div id="overlay" class="overlay"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
