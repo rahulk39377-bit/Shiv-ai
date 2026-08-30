@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1020">
+<title>SHIV AI PRO — LADLA GROUP</title>
+<style>
+:root{--bg:#07101f;--card:#101b31;--card2:#15233d;--text:#f4f7ff;--muted:#9eacc5;--accent:#7c5cff;--accent2:#00c2ff;--line:#243451}
+*{box-sizing:border-box} body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#07101f,#101a32);color:var(--text)}
+.app{min-height:100vh;display:flex}.side{width:270px;background:#0a1325;border-right:1px solid var(--line);padding:18px;position:fixed;height:100vh}
+.logo{font-size:24px;font-weight:800}.logo span{color:#8d79ff}.tag{font-size:11px;color:var(--muted);margin:5px 0 25px}
+button{border:0;border-radius:12px;padding:12px;cursor:pointer;color:white;background:var(--card2);font-weight:600}
+.new{width:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));margin-bottom:15px}
+.nav button{width:100%;text-align:left;margin:5px 0}.nav button.active{background:#23365c}
+.small{position:absolute;bottom:20px;left:18px;right:18px;color:var(--muted);font-size:12px}
+.main{margin-left:270px;flex:1;max-width:1100px;padding:25px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:15px}.top h1{margin:0;font-size:25px}.status{font-size:12px;color:#7fffb0;background:#123525;padding:8px 12px;border-radius:20px}
+.dashboard{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}.stat{background:var(--card);padding:16px;border:1px solid var(--line);border-radius:16px}.stat b{font-size:20px}.stat small{display:block;color:var(--muted);margin-top:5px}
+.chat{height:calc(100vh - 245px);min-height:440px;background:rgba(16,27,49,.92);border:1px solid var(--line);border-radius:20px;display:flex;flex-direction:column;overflow:hidden}
+.messages{flex:1;overflow:auto;padding:20px}.msg{max-width:80%;padding:13px 15px;border-radius:15px;margin:10px 0;line-height:1.45}.ai{background:#1b2b49;border:1px solid #29416b}.user{background:linear-gradient(135deg,#6449dc,#176e9a);margin-left:auto}.label{font-size:11px;color:#9fb2d5;margin-bottom:5px}
+.chips{padding:0 15px 12px;display:flex;gap:8px;overflow:auto}.chips button{white-space:nowrap;font-size:12px;padding:9px}
+.inputbar{display:flex;gap:8px;padding:14px;border-top:1px solid var(--line);background:#0d172a}.inputbar input{flex:1;background:#111f37;border:1px solid #2a3b5c;color:white;border-radius:12px;padding:14px;font-size:15px}.send{background:var(--accent);min-width:52px}.mic{background:#17304a}
+.panel{display:none;background:var(--card);border:1px solid var(--line);padding:20px;border-radius:18px;margin-top:20px}.panel.show{display:block}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.feature{background:var(--card2);padding:18px;border-radius:15px}.feature h3{margin:0 0 8px}.feature p{color:var(--muted);font-size:13px}.notice{color:#ffd47c;font-size:12px;margin-top:15px}
+.light{--bg:#eef3ff;--card:#fff;--card2:#f1f4fb;--text:#142033;--muted:#65718a;--line:#d9e1ef}body.light{background:#eef3ff}
+@media(max-width:760px){.side{display:none}.main{margin:0;padding:15px}.dashboard{grid-template-columns:repeat(2,1fr)}.chat{height:calc(100vh - 220px)}.top h1{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+ <div class="logo">ॐ <span>SHIV AI</span> PRO</div><div class="tag">POWERED BY LADLA GROUP</div>
+ <button class="new" onclick="newChat()">＋ New Chat</button>
+ <div class="nav">
+  <button class="active" onclick="showPanel('chat',this)">💬 AI Chat</button>
+  <button onclick="showPanel('business',this)">💼 Business Mode</button>
+  <button onclick="showPanel('creative',this)">🎨 Creative Studio</button>
+  <button onclick="showPanel('code',this)">💻 Code Assistant</button>
+  <button onclick="showPanel('files',this)">📂 File Assistant</button>
+  <button onclick="toggleTheme()">🌙 Light / Dark</button>
+ </div>
+ <div class="small">SHIV AI PRO v1.0<br>Demo frontend • API backend required</div>
+</aside>
+<main class="main">
+ <div class="top"><div><h1>नमस्ते! मैं SHIV AI हूँ 🙏</h1><div style="color:var(--muted);font-size:13px;margin-top:6px">LADLA GROUP का स्मार्ट AI Assistant</div></div><div class="status">● SYSTEM READY</div></div>
+ <div class="dashboard"><div class="stat"><b id="count">0</b><small>Messages</small></div><div class="stat"><b>Hindi</b><small>Language Support</small></div><div class="stat"><b>5+</b><small>AI Modes</small></div><div class="stat"><b>PRO</b><small>Version</small></div></div>
+
+ <section id="chat" class="panel show" style="margin-top:0">
+  <div class="chat">
+   <div id="messages" class="messages"><div class="msg ai"><div class="label">ॐ SHIV AI PRO</div>नमस्ते 🙏 मैं SHIV AI हूँ। आप मुझसे LADLA GROUP, business, coding, ideas या सामान्य सवाल पूछ सकते हैं।</div></div>
+   <div class="chips"><button onclick="quick('LADLA GROUP के बारे में बताओ')">LADLA GROUP</button><button onclick="quick('LADLA RENT के लिए idea दो')">LADLA RENT</button><button onclick="quick('DJ LADLA marketing plan')">DJ LADLA</button><button onclick="quick('HTML website बनाओ')">Coding</button></div>
+   <div class="inputbar"><button class="mic" onclick="voiceInput()">🎤</button><input id="input" placeholder="अपना सवाल लिखें..." onkeydown="if(event.key==='Enter')send()"><button class="send" onclick="send()">➤</button></div>
+  </div>
+ </section>
+
+ <section id="business" class="panel"><h2>💼 LADLA GROUP Business Mode</h2><div class="grid">
+  <div class="feature"><h3>🚕 LADLA RENT</h3><p>Pricing, partner commission, customer growth और booking ideas.</p><button onclick="quick('LADLA RENT business plan बनाओ')">Ask AI</button></div>
+  <div class="feature"><h3>🎧 DJ LADLA</h3><p>DJ sound, lights, mic और event rental marketing support.</p><button onclick="quick('DJ LADLA के लिए marketing strategy बनाओ')">Ask AI</button></div>
+  <div class="feature"><h3>📈 Growth</h3><p>Offers, banners, social media और customer acquisition ideas.</p><button onclick="quick('मेरे business की growth strategy दो')">Ask AI</button></div>
+ </div></section>
+
+ <section id="creative" class="panel"><h2>🎨 Creative Studio</h2><div class="grid">
+ <div class="feature"><h3>Banner Prompt</h3><p>Professional poster/banner बनाने के लिए prompt तैयार करें।</p><button onclick="quick('एक powerful LADLA GROUP launch banner का prompt बनाओ')">Create Prompt</button></div>
+ <div class="feature"><h3>Social Media</h3><p>Reel ideas, captions और campaign concepts.</p><button onclick="quick('LADLA GROUP के लिए viral reel ideas दो')">Generate Ideas</button></div>
+ </div></section>
+
+ <section id="code" class="panel"><h2>💻 Code Assistant</h2><p style="color:var(--muted)">HTML, CSS और JavaScript के लिए सहायता लें।</p><button onclick="quick('एक modern responsive HTML landing page बनाओ')">Start Coding</button></section>
+
+ <section id="files" class="panel"><h2>📂 File Assistant</h2><input type="file" id="file"><p class="notice">Frontend demo: असली PDF/DOC analysis के लिए backend या AI API integration जरूरी है।</p></section>
+</main>
+</div>
+<script>
+let messageCount=0;
+function showPanel(id,btn){document.querySelectorAll('.panel').forEach(x=>x.classList.remove('show'));document.getElementById(id).classList.add('show');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active')}
+function add(text,type){let d=document.createElement('div');d.className='msg '+type;d.innerHTML='<div class="label">'+(type==='ai'?'ॐ SHIV AI PRO':'YOU')+'</div>'+escapeHTML(text).replace(/\n/g,'<br>');document.getElementById('messages').appendChild(d);d.scrollIntoView({behavior:'smooth'});messageCount++;document.getElementById('count').textContent=messageCount}
+function escapeHTML(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function quick(t){showPanel('chat',document.querySelector('.nav button'));document.getElementById('input').value=t;send()}
+function send(){let i=document.getElementById('input'),q=i.value.trim();if(!q)return;add(q,'user');i.value='';setTimeout(()=>add(reply(q),'ai'),500)}
+function reply(q){let x=q.toLowerCase();if(x.includes('api'))return 'Real AI के लिए API key को सीधे HTML में रखना सुरक्षित नहीं है। बेहतर है secure backend/API server के माध्यम से AI service connect करें।';if(x.includes('ladla rent'))return 'LADLA RENT के लिए मैं pricing, partner system, booking flow, live location और commission dashboard बनाने की सलाह देता हूँ।';if(x.includes('dj ladla'))return 'DJ LADLA के लिए event packages, enquiry form, date availability, equipment list और WhatsApp booking जोड़ना अच्छा रहेगा।';if(x.includes('html')||x.includes('code'))return 'मैं coding सहायता के लिए तैयार हूँ। अपना feature या code बताइए, मैं HTML/CSS/JavaScript structure सुझाऊँगा।';return 'आपका सवाल मिला: “'+q+'”। यह PRO frontend demo है। वास्तविक intelligent AI उत्तर के लिए इसे किसी secure AI API/backend से connect करना होगा।'}
+function newChat(){document.getElementById('messages').innerHTML='';messageCount=0;document.getElementById('count').textContent=0;add('नई chat शुरू हो गई 🙏 मैं आपकी कैसे मदद करूँ?','ai')}
+function toggleTheme(){document.body.classList.toggle('light')}
+function voiceInput(){if(!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)){alert('आपके browser में Speech Recognition उपलब्ध नहीं है।');return}let R=window.SpeechRecognition||window.webkitSpeechRecognition,r=new R();r.lang='hi-IN';r.onresult=e=>{document.getElementById('input').value=e.results[0][0].transcript};r.start()}
+</script>
+</body>
+</html>
